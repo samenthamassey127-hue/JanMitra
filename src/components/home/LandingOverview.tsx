@@ -1,0 +1,205 @@
+import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
+import { useCitizen } from '../../context/CitizenContext';
+import { 
+  Search, 
+  HelpCircle, 
+  FolderCheck, 
+  Navigation, 
+  BarChart3, 
+  ShieldCheck, 
+  CheckCircle2, 
+  ArrowRight,
+  ExternalLink,
+  Sparkles,
+  FileText
+} from 'lucide-react';
+
+export const LandingOverview: React.FC = () => {
+  const { language, t } = useLanguage();
+  const { setActiveTab } = useCitizen();
+
+  const loopSteps = [
+    { num: '01', titleEn: 'My Situation', titleHi: 'मेरी स्थिति', descEn: 'Tell us in everyday words', descHi: 'अपनी जरूरत बताएं' },
+    { num: '02', titleEn: 'What Can I Get?', titleHi: 'क्या लाभ संभव है?', descEn: 'Discover relevant schemes', descHi: 'संबंधित योजनाएं खोजें' },
+    { num: '03', titleEn: 'Why May I Qualify?', titleHi: 'पात्रता क्यों बनती है?', descEn: 'Evidence-backed criteria match', descHi: 'तथ्यों पर आधारित मिलान' },
+    { num: '04', titleEn: 'What Am I Missing?', titleHi: 'क्या कमी है?', descEn: 'Identify document gaps', descHi: 'लापता दस्तावेजों की पहचान' },
+    { num: '05', titleEn: 'What Documents Needed?', titleHi: 'कौन से दस्तावेज चाहिए?', descEn: 'Locker gap checklist', descHi: 'दस्तावेज चेकलिस्ट' },
+    { num: '06', titleEn: 'How Do I Get Them?', titleHi: 'वे कैसे मिलेंगे?', descEn: 'Link directly to services', descHi: 'सीधे सरकारी सेवाओं से जुड़ें' },
+    { num: '07', titleEn: 'What Do I Do Next?', titleHi: 'आगे क्या करें?', descEn: 'Clear next actionable step', descHi: 'सटीक अगला कदम' },
+    { num: '08', titleEn: 'Track My Journey', titleHi: 'प्रगति ट्रैक करें', descEn: 'Organize applications', descHi: 'आवेदन स्थिति पर नजर रखें' }
+  ];
+
+  const pillars = [
+    {
+      icon: Search,
+      color: 'text-blue-600 bg-blue-50 border-blue-200',
+      titleEn: 'Discover',
+      titleHi: 'खोजें',
+      descEn: 'Find potentially relevant benefits based on your age, location, income, and education without needing to know department names.',
+      descHi: 'विभाग का नाम जाने बिना अपनी आयु, निवास, आय और शिक्षा के आधार पर संभावित योजनाओं की खोज करें।'
+    },
+    {
+      icon: HelpCircle,
+      color: 'text-indigo-600 bg-indigo-50 border-indigo-200',
+      titleEn: 'Understand',
+      titleHi: 'समझें',
+      descEn: 'Turn dense bureaucratic gazette circulars into simple human steps with our "Explain This" feature.',
+      descHi: 'कठिन सरकारी आदेशों और नियमों को "Explain This" टूल से आम बोलचाल की भाषा में समझें।'
+    },
+    {
+      icon: FolderCheck,
+      color: 'text-amber-600 bg-amber-50 border-amber-200',
+      titleEn: 'Prepare',
+      titleHi: 'तैयारी करें',
+      descEn: 'Scan your locker to know exactly which certificates are missing or expired before visiting any portal or counter.',
+      descHi: 'किसी भी पोर्टल पर जाने से पहले अपने लॉकर की जांच करें कि कौन सा दस्तावेज गायब या एक्सपायर है।'
+    },
+    {
+      icon: Navigation,
+      color: 'text-emerald-600 bg-emerald-50 border-emerald-200',
+      titleEn: 'Navigate',
+      titleHi: 'मार्गदर्शन',
+      descEn: 'Step-by-step procedures covering where to go, fees, Lekhpal verification, and official portal links.',
+      descHi: 'कदम-दर-कदम प्रक्रिया: कहां जाना है, कितना शुल्क है, लेखपाल जांच कैसे होगी, और आधिकारिक लिंक।'
+    },
+    {
+      icon: BarChart3,
+      color: 'text-purple-600 bg-purple-50 border-purple-200',
+      titleEn: 'Track',
+      titleHi: 'ट्रैक करें',
+      descEn: 'Organize active applications across multiple departments in one single unified citizen dashboard.',
+      descHi: 'विभिन्न सरकारी विभागों के अपने सभी आवेदनों को एक ही नागरिक डैशबोर्ड में व्यवस्थित रखें।'
+    }
+  ];
+
+  return (
+    <section className="py-16 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Section Header */}
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <span className="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-50 px-3 py-1 rounded-full border border-brand-200">
+            Citizen-First Operating Philosophy
+          </span>
+          <h2 className="mt-3 text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            One place to understand government processes
+          </h2>
+          <p className="mt-2 text-slate-600 text-sm sm:text-base">
+            Citizens should not need to understand the administrative structure of government in order to access public services.
+          </p>
+        </div>
+
+        {/* 5 Core Pillars (Section 31) */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-16">
+          {pillars.map((pillar, idx) => {
+            const Icon = pillar.icon;
+            return (
+              <div 
+                key={idx}
+                className="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-slate-300 transition-all hover:shadow-md"
+              >
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 border ${pillar.color}`}>
+                  <Icon className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-slate-900 text-base mb-1.5">
+                  {language === 'hi' ? pillar.titleHi : pillar.titleEn}
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  {language === 'hi' ? pillar.descHi : pillar.descEn}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* The Fundamental Product Loop (Section 33) */}
+        <div className="bg-gradient-to-br from-brand-900 via-brand-950 to-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-xl overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div className="max-w-2xl mb-8">
+            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-saffron-500/20 text-saffron-300 text-xs font-semibold uppercase tracking-wider mb-2">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Core Differentiator</span>
+            </span>
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              The JanMitra Action Loop
+            </h3>
+            <p className="mt-2 text-slate-300 text-sm leading-relaxed">
+              We turn your real-life situation into an evidence-backed roadmap with zero guesswork.
+            </p>
+          </div>
+
+          {/* Loop Stepper Horizontal / Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
+            {loopSteps.map((st, idx) => (
+              <div 
+                key={idx}
+                className="bg-white/5 border border-white/10 rounded-xl p-3 flex flex-col justify-between hover:bg-white/10 transition-colors relative group"
+              >
+                <div>
+                  <span className="text-[10px] font-mono font-bold text-saffron-400 block mb-1">
+                    STEP {st.num}
+                  </span>
+                  <h4 className="text-xs font-bold text-white group-hover:text-saffron-300 transition-colors leading-tight">
+                    {language === 'hi' ? st.titleHi : st.titleEn}
+                  </h4>
+                </div>
+                <p className="text-[10px] text-slate-400 mt-2 line-clamp-2">
+                  {language === 'hi' ? st.descHi : st.descEn}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom Loop Action */}
+          <div className="mt-8 pt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-xs text-slate-300">
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>Every recommendation is pinned to verified gazettes and official department orders.</span>
+            </div>
+            <button
+              onClick={() => setActiveTab('discover')}
+              className="px-5 py-2.5 rounded-xl bg-saffron-500 hover:bg-saffron-600 text-slate-950 font-bold text-xs flex items-center gap-2 shadow-md transition-all cursor-pointer"
+            >
+              <span>Start Discovery Now</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* The 5 Questions JanMitra Answers (Section 32) */}
+        <div className="mt-14 bg-slate-50 border border-slate-200 rounded-2xl p-6 sm:p-8">
+          <div className="flex items-center gap-2 text-slate-900 font-bold text-base mb-4">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+            <span>5 Core Questions JanMitra Answers for Every Citizen:</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
+            <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
+              <span className="font-bold text-brand-700 block mb-1">1. Relevant Benefits</span>
+              <span className="text-slate-600">What government benefits might be relevant to my situation?</span>
+            </div>
+            <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
+              <span className="font-bold text-brand-700 block mb-1">2. Qualification</span>
+              <span className="text-slate-600">Why might I qualify based on criteria rules?</span>
+            </div>
+            <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
+              <span className="font-bold text-brand-700 block mb-1">3. Missing Factors</span>
+              <span className="text-slate-600">What documents or information am I missing?</span>
+            </div>
+            <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
+              <span className="font-bold text-brand-700 block mb-1">4. Exact Procedure</span>
+              <span className="text-slate-600">What exactly do I need to do step-by-step?</span>
+            </div>
+            <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
+              <span className="font-bold text-brand-700 block mb-1">5. Next Immediate Step</span>
+              <span className="text-slate-600">What should I do right now to make progress?</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  );
+};

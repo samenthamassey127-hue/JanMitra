@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  body {
+    @apply bg-slate-50 text-slate-900 min-h-screen flex flex-col font-sans;
+  }
+
+  /* Custom scrollbar for modern feel */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+}
+
+/* Hindi typography adjustments */
+[lang="hi"], .font-devanagari {
+  font-family: 'Noto Sans Devanagari', 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+/* Pulsing audio wave animation for voice search simulation */
+@keyframes soundwave {
+  0%, 100% { height: 6px; }
+  50% { height: 26px; }
+}
+
+.animate-soundwave-1 {
+  animation: soundwave 0.8s ease-in-out infinite;
+}
+.animate-soundwave-2 {
+  animation: soundwave 0.8s ease-in-out 0.2s infinite;
+}
+.animate-soundwave-3 {
+  animation: soundwave 0.8s ease-in-out 0.4s infinite;
+}
+.animate-soundwave-4 {
+  animation: soundwave 0.8s ease-in-out 0.1s infinite;
+}
