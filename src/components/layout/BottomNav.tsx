@@ -1,33 +1,44 @@
 import React from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCitizen } from '../../context/CitizenContext';
-import { Home, Compass, MapPin, FolderCheck, User } from 'lucide-react';
+import { Home, Compass, MapPin, FolderCheck, User, Radio } from 'lucide-react';
 
 export const BottomNav: React.FC = () => {
   const { t } = useLanguage();
   const { activeTab, setActiveTab, journeys } = useCitizen();
 
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 py-1 shadow-lg">
-      <div className="grid grid-cols-5 items-center">
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-1 py-1 shadow-lg">
+      <div className="grid grid-cols-6 items-center">
         <button
           onClick={() => setActiveTab('home')}
-          className={`flex flex-col items-center py-1.5 px-1 rounded-lg transition-colors ${
+          className={`flex flex-col items-center py-1.5 px-0.5 rounded-lg transition-colors ${
             activeTab === 'home' ? 'text-brand-700 font-semibold' : 'text-slate-500 hover:text-slate-800'
           }`}
         >
           <Home className="w-5 h-5 mb-0.5" />
-          <span className="text-[10px] truncate max-w-full">{t('nav.home')}</span>
+          <span className="text-[9px] truncate max-w-full">{t('nav.home')}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('discover')}
-          className={`flex flex-col items-center py-1.5 px-1 rounded-lg transition-colors ${
+          className={`flex flex-col items-center py-1.5 px-0.5 rounded-lg transition-colors ${
             activeTab === 'discover' ? 'text-brand-700 font-semibold' : 'text-slate-500 hover:text-slate-800'
           }`}
         >
           <Compass className="w-5 h-5 mb-0.5" />
-          <span className="text-[10px] truncate max-w-full">{t('nav.discover')}</span>
+          <span className="text-[9px] truncate max-w-full">{t('nav.discover')}</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('vakh')}
+          className={`flex flex-col items-center py-1.5 px-0.5 rounded-lg transition-colors ${
+            activeTab === 'vakh' ? 'text-emerald-700 font-bold' : 'text-slate-500 hover:text-slate-800'
+          }`}
+          title="Vakh Chaupal"
+        >
+          <Radio className="w-5 h-5 mb-0.5 text-emerald-600 animate-pulse" />
+          <span className="text-[9px] truncate max-w-full font-semibold text-emerald-700">Vakh</span>
         </button>
 
         <button

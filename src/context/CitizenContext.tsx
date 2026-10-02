@@ -25,7 +25,7 @@ interface CitizenContextType {
   activeScenarioId: ShowcaseScenario['id'] | null;
   resetAllData: () => void;
   exportDataJson: () => string;
-  activeTab: 'home' | 'discover' | 'services' | 'journey' | 'documents' | 'saved' | 'profile' | 'explain';
+  activeTab: 'home' | 'discover' | 'services' | 'journey' | 'documents' | 'saved' | 'profile' | 'explain' | 'vakh';
   setActiveTab: (tab: any) => void;
   selectedSchemeId: string | null;
   setSelectedSchemeId: (id: string | null) => void;
@@ -172,7 +172,7 @@ export const CitizenProvider: React.FC<{ children: React.ReactNode }> = ({ child
   });
 
   const [activeScenarioId, setActiveScenarioId] = useState<ShowcaseScenario['id'] | null>('student');
-  const [activeTab, setActiveTab] = useState<'home' | 'discover' | 'services' | 'journey' | 'documents' | 'saved' | 'profile' | 'explain'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'discover' | 'services' | 'journey' | 'documents' | 'saved' | 'profile' | 'explain' | 'vakh'>('home');
   const [selectedSchemeId, setSelectedSchemeId] = useState<string | null>(null);
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
   const [selectedLegalSnippetId, setSelectedLegalSnippetId] = useState<string | null>(null);

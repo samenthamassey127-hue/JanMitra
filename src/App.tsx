@@ -14,6 +14,7 @@ import { GovernmentSimplifier } from './components/explain/GovernmentSimplifier'
 import { SavedItems } from './components/profile/SavedItems';
 import { ProfileEditor } from './components/profile/ProfileEditor';
 import { PrivacyCenter } from './components/profile/PrivacyCenter';
+import { VakhCommunityBoard } from './components/vakh/VakhCommunityBoard';
 import { GlobalSearchModal } from './components/search/GlobalSearchModal';
 import { ALL_SERVICES, getServiceById } from './data/services';
 import { CategoryKey } from './types';
@@ -98,6 +99,10 @@ const MainAppContent: React.FC = () => {
 
           {activeTab === 'explain' && (
             <GovernmentSimplifier />
+          )}
+
+          {activeTab === 'vakh' && (
+            <VakhCommunityBoard />
           )}
 
           {activeTab === 'saved' && (

@@ -16,7 +16,8 @@ import {
   Sparkles,
   ExternalLink,
   Menu,
-  X
+  X,
+  Radio
 } from 'lucide-react';
 
 export const Header: React.FC = () => {
@@ -158,6 +159,16 @@ export const Header: React.FC = () => {
             >
               <HelpCircle className="w-4 h-4 text-indigo-600" />
               <span>{t('nav.explain')}</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('vakh')}
+              className={`px-3 py-2 rounded-lg transition-colors flex items-center gap-1.5 ${
+                activeTab === 'vakh' ? 'bg-emerald-100 text-emerald-800 font-bold' : 'hover:bg-slate-100 hover:text-slate-900'
+              }`}
+              title="Vakh Civic Chaupal by @samentha"
+            >
+              <Radio className="w-4 h-4 text-emerald-600 animate-pulse" />
+              <span>Vakh Chaupal</span>
             </button>
             <button
               onClick={() => setActiveTab('saved')}
@@ -352,6 +363,13 @@ export const Header: React.FC = () => {
           >
             <HelpCircle className="w-4 h-4 text-indigo-600" />
             <span>{t('nav.explain')}</span>
+          </button>
+          <button
+            onClick={() => { setActiveTab('vakh'); setMobileMenuOpen(false); }}
+            className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold hover:bg-emerald-50 text-emerald-800 flex items-center gap-2"
+          >
+            <Radio className="w-4 h-4 text-emerald-600 animate-pulse" />
+            <span>Vakh Chaupal (@samentha)</span>
           </button>
           <button
             onClick={() => { setActiveTab('saved'); setMobileMenuOpen(false); }}

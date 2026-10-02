@@ -12,7 +12,8 @@ import {
   ArrowRight,
   ExternalLink,
   Sparkles,
-  FileText
+  FileText,
+  Radio
 } from 'lucide-react';
 
 export const LandingOverview: React.FC = () => {
@@ -165,6 +166,45 @@ export const LandingOverview: React.FC = () => {
               <span>Start Discovery Now</span>
               <ArrowRight className="w-4 h-4" />
             </button>
+          </div>
+        </div>
+
+        {/* Vakh Civic Chaupal Feature Callout */}
+        <div className="mt-14 bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl border border-emerald-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2 max-w-2xl">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-xs uppercase tracking-wider border border-emerald-400/30">
+                <Radio className="w-3.5 h-3.5 animate-pulse text-emerald-400" />
+                New: Powered by Vakh.com
+              </span>
+              <span className="text-xs text-emerald-200">Hyperlocal Community Feed</span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-black text-white">
+              {language === 'hi' ? 'वख जन-चौपाल — जमीनी अपडेट एवं शिविर' : 'Vakh Civic Chaupal — Real-Time Ground Notices'}
+            </h3>
+            <p className="text-emerald-100/90 text-xs sm:text-sm leading-relaxed">
+              {language === 'hi'
+                ? 'तहसील काउंटर की स्थिति, सीएससी शिविर और लेखपाल सत्यापन की वास्तविक सूचनाएं। क्यूरेटेड और मॉडरेटेड: Samentha Massey (@samentha)।'
+                : 'Live ground updates on local CSC kiosks, Tehsil verification availability, and welfare camps. Curated by Samentha Massey (@samentha) on Vakh.'}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={() => setActiveTab('vakh')}
+              className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition cursor-pointer"
+            >
+              Open Vakh Chaupal
+            </button>
+            <a
+              href="https://vakh.com/@samentha"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs rounded-xl border border-white/20 transition flex items-center gap-1.5"
+            >
+              <span>@samentha</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
           </div>
         </div>
 

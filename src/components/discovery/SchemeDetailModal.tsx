@@ -17,7 +17,8 @@ import {
   Bookmark, 
   ArrowRight,
   Sparkles,
-  Info
+  Info,
+  Radio
 } from 'lucide-react';
 
 interface SchemeDetailModalProps {
@@ -32,7 +33,7 @@ export const SchemeDetailModal: React.FC<SchemeDetailModalProps> = ({
   onNavigateToService
 }) => {
   const { language, t } = useLanguage();
-  const { profile, documents, savedSchemeIds, toggleSaveScheme, addJourney } = useCitizen();
+  const { profile, documents, savedSchemeIds, toggleSaveScheme, addJourney, setActiveTab } = useCitizen();
 
   const [evidenceExpanded, setEvidenceExpanded] = useState(true);
   const evaluation = evaluateSchemeForUser(scheme, profile, documents);
@@ -341,6 +342,18 @@ export const SchemeDetailModal: React.FC<SchemeDetailModalProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('vakh');
+                onClose();
+              }}
+              className="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-300 flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Check live ground updates on Vakh Chaupal"
+            >
+              <Radio className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
+              <span>Ground Updates on Vakh</span>
+            </button>
             <button
               type="button"
               onClick={onClose}
