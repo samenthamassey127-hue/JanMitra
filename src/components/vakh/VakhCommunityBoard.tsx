@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Radio, 
   MapPin, 
@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useCitizen } from '../../context/CitizenContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { fetchVakhNotices, broadcastVakhNotice } from '../../utils/apiClient';
 
 export interface VakhNotice {
   id: string;
@@ -124,6 +125,17 @@ export const VakhCommunityBoard: React.FC = () => {
 
   const districtsList = ['All Districts', 'Lucknow', 'Varanasi', 'Kanpur Nagar', 'Barabanki', 'Gorakhpur', 'Prayagraj'];
 
+  // Sync with backend API
+  useEffect(() => {
+    let isMounted = true;
+    fetchVakhNotices(selectedDistrict === 'All Districts' ? undefined : selectedDistrict).then(serverNotices => {
+      if (isMounted && serverNotices && serverNotices.length > 0) {
+        setNotices(serverNotices);
+      }
+    });
+    return () => { isMounted = false; };
+  }, [selectedDistrict]);
+
   // Filter notices
   const filteredNotices = notices.filter(n => {
     const matchesDistrict = selectedDistrict === 'All Districts' || n.district.toLowerCase() === selectedDistrict.toLowerCase();
@@ -131,26 +143,35 @@ export const VakhCommunityBoard: React.FC = () => {
     return matchesDistrict && matchesCat;
   });
 
-  const handlePostNotice = (e: React.FormEvent) => {
+  const handlePostNotice = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newText.trim()) return;
 
-    const newNotice: VakhNotice = {
-      id: 'vn-' + Date.now(),
+    const noticePayload = {
       author: profile.name || 'Citizen',
       handle: `@${(profile.name || 'citizen').toLowerCase().replace(/\s+/g, '')}`,
       role: 'Citizen',
       location: `${profile.district || 'Local'} Ward`,
       district: profile.district || 'Lucknow',
       content: newText,
+      category: 'Guidance' as const
+    };
+
+    // Optimistic UI update
+    const newNotice: VakhNotice = {
+      id: 'vn-' + Date.now(),
+      ...noticePayload,
+      role: 'Citizen',
       timestamp: 'Just now',
       verified: false,
-      category: 'Guidance',
       likes: 1
     };
 
     setNotices([newNotice, ...notices]);
     setNewText('');
+
+    // Broadcast to backend if online
+    await broadcastVakhNotice(noticePayload);
   };
 
   const handleLike = (id: string) => {

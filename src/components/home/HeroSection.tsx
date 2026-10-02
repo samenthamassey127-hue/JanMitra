@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCitizen } from '../../context/CitizenContext';
+import { analyzeSituationWithBackend } from '../../utils/apiClient';
 import { CategoryKey } from '../../types';
 import { 
   GraduationCap, 
@@ -51,13 +52,42 @@ export const HeroSection: React.FC<{ onSelectCategory: (category: CategoryKey) =
     }
   ];
 
-  const handleAnalyzeInput = (e?: React.FormEvent) => {
+  const handleAnalyzeInput = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!inputText.trim()) return;
 
     setIsProcessingNlp(true);
 
-    // Simulate structured situation parsing from free natural language
+    try {
+      const backendResult = await analyzeSituationWithBackend(inputText, language);
+      if (backendResult?.profile) {
+        const p = backendResult.profile;
+        const updates: any = {};
+        if (p.age) updates.age = p.age;
+        if (p.district) updates.district = p.district;
+        if (p.state) updates.state = p.state;
+        if (p.education) updates.education = p.education;
+        if (p.occupation) updates.occupation = p.occupation;
+        if (p.incomeValue) {
+          updates.incomeValue = p.incomeValue;
+          updates.incomeRange = p.incomeRange || (p.incomeValue <= 100000 ? '< ₹1.0L' : '₹1.0L - ₹2.5L');
+        }
+        if (p.category) updates.category = p.category;
+        updateProfile(updates);
+
+        if (p.goal && p.goal.toLowerCase().includes('certificate')) {
+          setActiveTab('services');
+        } else {
+          setActiveTab('discover');
+        }
+        setIsProcessingNlp(false);
+        return;
+      }
+    } catch (err) {
+      console.log('Using local fallback parser:', err);
+    }
+
+    // Deterministic client-side fallback
     setTimeout(() => {
       const lower = inputText.toLowerCase();
       
@@ -98,7 +128,7 @@ export const HeroSection: React.FC<{ onSelectCategory: (category: CategoryKey) =
       }
 
       setIsProcessingNlp(false);
-    }, 600);
+    }, 400);
   };
 
   const categories = [
