@@ -5,4 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: './', // Ensures assets load correctly on GitHub Pages, Vercel, Netlify, or custom subpaths
+  server: {
+    host: true,
+    port: 5173
+  }
 })
