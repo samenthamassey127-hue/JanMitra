@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCitizen } from '../../context/CitizenContext';
 import { Scheme } from '../../types';
@@ -39,14 +40,30 @@ export const SchemeDetailModal: React.FC<SchemeDetailModalProps> = ({
   const evaluation = evaluateSchemeForUser(scheme, profile, documents);
   const isSaved = savedSchemeIds.includes(scheme.id);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onClose]);
+
   // Progress metrics for "What Am I Missing?"
   const totalCriteria = evaluation.totalRulesCount + evaluation.totalDocsCount;
   const completedCriteria = evaluation.matchedRulesCount + evaluation.availableDocsCount;
   const progressPercent = Math.min(100, Math.round((completedCriteria / (totalCriteria || 1)) * 100));
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-3 sm:p-6 overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
+  const modalContent = (
+    <div 
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-3 sm:p-6 overflow-y-auto"
+    >
+      <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 my-auto">
         
         {/* Modal Top Header */}
         <div className="p-5 sm:p-6 bg-slate-900 text-white flex items-start justify-between gap-4 border-b border-slate-800">
@@ -394,4 +411,6 @@ export const SchemeDetailModal: React.FC<SchemeDetailModalProps> = ({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalContent, document.body) : null;
 };

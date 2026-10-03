@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCitizen } from '../../context/CitizenContext';
 import { ALL_SCHEMES } from '../../data/schemes';
@@ -28,6 +29,7 @@ export const GlobalSearchModal: React.FC = () => {
   const [activeSegment, setActiveSegment] = useState<'all' | 'schemes' | 'services' | 'documents'>('all');
 
   useEffect(() => {
+    if (!isSearchOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setIsSearchOpen(false);
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
@@ -35,9 +37,14 @@ export const GlobalSearchModal: React.FC = () => {
         setIsSearchOpen(true);
       }
     };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [setIsSearchOpen]);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isSearchOpen, setIsSearchOpen]);
 
   if (!isSearchOpen) return null;
 
@@ -55,8 +62,11 @@ export const GlobalSearchModal: React.FC = () => {
     !q || d.name.toLowerCase().includes(q) || d.nameHi.toLowerCase().includes(q) || d.type.toLowerCase().includes(q)
   );
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in">
+  const modalContent = (
+    <div 
+      onClick={(e) => { if (e.target === e.currentTarget) setIsSearchOpen(false); }}
+      className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in"
+    >
       <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[80vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
         
         {/* Search Input Bar */}
@@ -238,4 +248,6 @@ export const GlobalSearchModal: React.FC = () => {
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalContent, document.body) : null;
 };

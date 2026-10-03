@@ -399,17 +399,18 @@ export const Header: React.FC = () => {
         </div>
 
         {/* Quick Showcase Scenario Ribbon (Section 30 Demo Feature) */}
-        <div className="py-2 border-t border-slate-100 flex items-center justify-between gap-3 overflow-x-auto text-xs no-scrollbar">
+        <div className="py-2 border-t border-slate-100 flex items-center justify-between gap-3 overflow-x-auto text-xs no-scrollbar w-full min-w-0">
           <div className="flex items-center gap-1.5 text-slate-500 font-medium shrink-0">
             <Sparkles className="w-3.5 h-3.5 text-saffron-600" />
-            <span>Interactive Demo Scenarios:</span>
+            <span className="hidden sm:inline">Interactive Demo Scenarios:</span>
+            <span className="sm:hidden font-semibold">Demos:</span>
           </div>
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-1.5 min-w-0 overflow-x-auto no-scrollbar shrink-0 sm:shrink">
             {SHOWCASE_SCENARIOS.map(sc => (
               <button
                 key={sc.id}
                 onClick={() => loadScenario(sc.id)}
-                className={`px-2.5 py-1 rounded-md font-medium transition-all text-[11px] flex items-center gap-1 ${
+                className={`px-2.5 py-1 rounded-md font-medium transition-all text-[11px] whitespace-nowrap shrink-0 flex items-center gap-1 ${
                   activeScenarioId === sc.id
                     ? 'bg-brand-800 text-white shadow-xs'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -420,7 +421,6 @@ export const Header: React.FC = () => {
             ))}
           </div>
         </div>
-
       </div>
 
       {/* Mobile Drawer Menu */}

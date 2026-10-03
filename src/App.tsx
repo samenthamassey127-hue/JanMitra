@@ -54,7 +54,7 @@ const MainAppContent: React.FC = () => {
   const activeService = selectedServiceId ? getServiceById(selectedServiceId) : null;
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 w-full max-w-full overflow-x-hidden">
       
       {/* Global Header */}
       <Header />
@@ -63,15 +63,15 @@ const MainAppContent: React.FC = () => {
       <GlobalSearchModal />
 
       {/* Main Screen Router */}
-      <main className="flex-1 pb-20 lg:pb-12">
+      <main className="flex-1 pb-20 xl:pb-12 w-full max-w-full overflow-x-hidden">
         {activeTab === 'home' && (
-          <div>
+          <div className="w-full max-w-full overflow-x-hidden">
             <HeroSection onSelectCategory={handleSelectCategory} />
             <LandingOverview />
           </div>
         )}
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 w-full">
           {activeTab === 'discover' && (
             <DiscoverView onNavigateToService={handleNavigateToService} />
           )}
@@ -131,8 +131,8 @@ const MainAppContent: React.FC = () => {
       <BottomNav />
 
       {/* Comprehensive Government Trust Footer */}
-      <footer className="bg-slate-900 text-slate-300 border-t border-slate-800 text-xs py-10 mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      <footer className="bg-slate-900 text-slate-300 border-t border-slate-800 text-xs py-10 mt-12 w-full max-w-full overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 w-full">
           
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
             <div className="flex items-center gap-3">

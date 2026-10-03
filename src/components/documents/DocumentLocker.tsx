@@ -163,12 +163,12 @@ export const DocumentLocker: React.FC<{ onNavigateToService: (serviceId: string)
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <label className="text-xs font-semibold text-slate-600">Audit for:</label>
+          <div className="flex items-center gap-2 min-w-0 max-w-full">
+            <label className="text-xs font-semibold text-slate-600 shrink-0">Audit for:</label>
             <select
               value={selectedSchemeForMatch}
               onChange={(e) => setSelectedSchemeForMatch(e.target.value)}
-              className="px-3 py-1.5 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-800 focus:outline-hidden focus:border-brand-600 shadow-2xs"
+              className="px-3 py-1.5 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-800 focus:outline-hidden focus:border-brand-600 shadow-2xs w-full sm:w-auto max-w-[260px] sm:max-w-xs md:max-w-sm truncate"
             >
               {ALL_SCHEMES.map(s => (
                 <option key={s.id} value={s.id}>{s.name}</option>
