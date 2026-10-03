@@ -63,7 +63,7 @@ const MainAppContent: React.FC = () => {
       <GlobalSearchModal />
 
       {/* Main Screen Router */}
-      <main className="flex-1 pb-20 xl:pb-12 w-full max-w-full overflow-x-hidden">
+      <main className="flex-1 pb-20 lg:pb-12 w-full max-w-full overflow-x-hidden">
         {activeTab === 'home' && (
           <div className="w-full max-w-full overflow-x-hidden">
             <HeroSection onSelectCategory={handleSelectCategory} />

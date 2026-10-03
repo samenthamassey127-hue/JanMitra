@@ -197,34 +197,36 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs w-full max-w-full">
       {/* Top Government Disclaimer & Trust Bar */}
-      <div className="bg-slate-900 text-slate-200 px-4 py-1.5 text-xs flex flex-wrap items-center justify-between gap-2 border-b border-slate-800">
-        <div className="flex items-center gap-2 max-w-4xl">
-          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold text-[10px] tracking-wide uppercase">
-            Notice
-          </span>
-          <span className="truncate text-slate-300">
-            {t('disclaimer.text')}
-          </span>
-        </div>
-        <div className="flex items-center gap-4 text-[11px] text-slate-400 shrink-0">
-          <span className="hidden sm:inline">Context: <strong className="text-white">India / Uttar Pradesh</strong></span>
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-          <span>Verified Sept 2026</span>
+      <div className="bg-slate-900 text-slate-200 py-1.5 text-xs border-b border-slate-800 w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold text-[10px] tracking-wide uppercase shrink-0">
+              Notice
+            </span>
+            <span className="text-slate-300 text-[11px] leading-normal">
+              {t('disclaimer.text')}
+            </span>
+          </div>
+          <div className="flex items-center gap-3 text-[11px] text-slate-400 shrink-0">
+            <span>Context: <strong className="text-white">India / Uttar Pradesh</strong></span>
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span>Verified Sept 2026</span>
+          </div>
         </div>
       </div>
 
-      {/* Main Bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
+      {/* Main Bar (Row 1: Brand Identity & Citizen Command Tools) */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div className="flex items-center justify-between h-16 gap-3 min-w-0">
           
           {/* Logo & Identity */}
           <div 
             onClick={() => setActiveTab('home')}
             className="flex items-center gap-3 cursor-pointer group shrink-0"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-700 to-brand-900 text-white flex items-center justify-center shadow-md shadow-brand-700/20 group-hover:scale-105 transition-transform relative overflow-hidden">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-700 to-brand-900 text-white flex items-center justify-center shadow-md shadow-brand-700/20 group-hover:scale-105 transition-transform relative overflow-hidden shrink-0">
               {/* Ashoka/Chakra Motif */}
               <div className="w-6 h-6 rounded-full border border-saffron-400/80 flex items-center justify-center">
                 <div className="w-2.5 h-2.5 rounded-full bg-saffron-400"></div>
@@ -246,103 +248,17 @@ export const Header: React.FC = () => {
             </div>
           </div>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden xl:flex items-center gap-1 xl:gap-1.5 text-xs xl:text-sm font-semibold text-slate-600">
-            <button
-              onClick={() => setActiveTab('home')}
-              className={`px-3 py-2 rounded-lg transition-colors ${
-                activeTab === 'home' ? 'bg-brand-50 text-brand-700 font-semibold' : 'hover:bg-slate-100 hover:text-slate-900'
-              }`}
-            >
-              {t('nav.home')}
-            </button>
-            <button
-              onClick={() => setActiveTab('discover')}
-              className={`px-3 py-2 rounded-lg transition-colors flex items-center gap-1.5 ${
-                activeTab === 'discover' ? 'bg-brand-50 text-brand-700 font-semibold' : 'hover:bg-slate-100 hover:text-slate-900'
-              }`}
-            >
-              <Compass className="w-4 h-4 text-brand-600" />
-              <span>{t('nav.discover')}</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('services')}
-              className={`px-3 py-2 rounded-lg transition-colors flex items-center gap-1.5 ${
-                activeTab === 'services' ? 'bg-brand-50 text-brand-700 font-semibold' : 'hover:bg-slate-100 hover:text-slate-900'
-              }`}
-            >
-              <FileText className="w-4 h-4 text-slate-500" />
-              <span>{t('nav.services')}</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('journey')}
-              className={`px-3 py-2 rounded-lg transition-colors flex items-center gap-1.5 relative ${
-                activeTab === 'journey' ? 'bg-brand-50 text-brand-700 font-semibold' : 'hover:bg-slate-100 hover:text-slate-900'
-              }`}
-            >
-              <MapPin className="w-4 h-4 text-emerald-600" />
-              <span>{t('nav.journey')}</span>
-              {activeJourneysCount > 0 && (
-                <span className="w-4 h-4 rounded-full bg-emerald-600 text-white text-[10px] flex items-center justify-center font-bold">
-                  {activeJourneysCount}
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab('documents')}
-              className={`px-3 py-2 rounded-lg transition-colors flex items-center gap-1.5 ${
-                activeTab === 'documents' ? 'bg-brand-50 text-brand-700 font-semibold' : 'hover:bg-slate-100 hover:text-slate-900'
-              }`}
-            >
-              <FolderCheck className="w-4 h-4 text-amber-600" />
-              <span>{t('nav.documents')}</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('explain')}
-              className={`px-3 py-2 rounded-lg transition-colors flex items-center gap-1.5 ${
-                activeTab === 'explain' ? 'bg-brand-50 text-brand-700 font-semibold' : 'hover:bg-slate-100 hover:text-slate-900'
-              }`}
-            >
-              <HelpCircle className="w-4 h-4 text-indigo-600" />
-              <span>{t('nav.explain')}</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('vakh')}
-              className={`px-3 py-2 rounded-lg transition-colors flex items-center gap-1.5 ${
-                activeTab === 'vakh' ? 'bg-emerald-100 text-emerald-800 font-bold' : 'hover:bg-slate-100 hover:text-slate-900'
-              }`}
-              title="Vakh Civic Chaupal by @samentha"
-            >
-              <Radio className="w-4 h-4 text-emerald-600 animate-pulse" />
-              <span>Vakh Chaupal</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('saved')}
-              className={`px-2.5 py-2 rounded-lg transition-colors relative ${
-                activeTab === 'saved' ? 'bg-brand-50 text-brand-700 font-semibold' : 'hover:bg-slate-100 hover:text-slate-900'
-              }`}
-              title={t('nav.saved')}
-            >
-              <Bookmark className="w-4 h-4" />
-              {totalSaved > 0 && (
-                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-saffron-500 text-white text-[10px] flex items-center justify-center font-bold">
-                  {totalSaved}
-                </span>
-              )}
-            </button>
-          </nav>
-
-          {/* Right Action Tools: Search, Voice, Language, Scenario Switcher, Profile */}
-          <div className="flex items-center gap-2">
+          {/* Right Action Tools: Search, Voice, Language, Full User Account & Login ID */}
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             
             {/* Quick Global Search Trigger */}
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white text-slate-500 hover:text-slate-800 text-xs transition-all shadow-xs"
+              className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white text-slate-600 hover:text-slate-900 text-xs transition-all shadow-2xs"
               title="Search benefits, services, documents"
             >
               <Search className="w-3.5 h-3.5 text-slate-400" />
-              <span className="truncate max-w-[120px]">{t('action.search')}</span>
+              <span>{t('action.search')}</span>
               <kbd className="hidden lg:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-white border border-slate-200 rounded text-slate-400">
                 /
               </kbd>
@@ -352,7 +268,7 @@ export const Header: React.FC = () => {
             <div className="relative">
               <button
                 onClick={handleVoiceClick}
-                className={`p-2 rounded-lg border transition-all ${
+                className={`p-2 rounded-xl border transition-all ${
                   isListening 
                     ? 'bg-rose-50 border-rose-300 text-rose-600 shadow-md ring-2 ring-rose-200 animate-pulse' 
                     : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-brand-700'
@@ -387,10 +303,10 @@ export const Header: React.FC = () => {
             </div>
 
             {/* Language Toggle */}
-            <div className="flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200 text-xs font-semibold">
+            <div className="flex items-center bg-slate-100 rounded-xl p-0.5 border border-slate-200 text-xs font-semibold">
               <button
                 onClick={() => setLanguage('en')}
-                className={`px-2 py-1 rounded-md transition-all ${
+                className={`px-2 py-1 rounded-lg transition-all ${
                   language === 'en' 
                     ? 'bg-white text-brand-800 shadow-xs' 
                     : 'text-slate-500 hover:text-slate-800'
@@ -400,7 +316,7 @@ export const Header: React.FC = () => {
               </button>
               <button
                 onClick={() => setLanguage('hi')}
-                className={`px-2 py-1 rounded-md transition-all ${
+                className={`px-2 py-1 rounded-lg transition-all ${
                   language === 'hi' 
                     ? 'bg-white text-brand-800 shadow-xs' 
                     : 'text-slate-500 hover:text-slate-800'
@@ -410,22 +326,29 @@ export const Header: React.FC = () => {
               </button>
             </div>
 
-            {/* User Account & Login ID Button */}
+            {/* Prominent User Account & Login ID Button (Completely Unclipped) */}
             <button
               onClick={() => setAuthModalOpen(true)}
-              className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-brand-200 bg-white hover:bg-brand-50/80 text-slate-800 transition-all cursor-pointer shadow-2xs max-w-[190px] sm:max-w-[220px]"
+              className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-brand-200 bg-white hover:bg-brand-50 text-slate-800 transition-all cursor-pointer shadow-2xs shrink-0"
               title={currentUser ? `Logged in: ${currentUser.name} (${currentUser.loginId || currentUser.email})` : 'Sign In / Account'}
             >
-              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-brand-700 to-brand-900 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-700 to-brand-900 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
                 {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : <User className="w-3.5 h-3.5" />}
               </div>
-              <div className="flex flex-col text-left min-w-0 leading-tight">
-                <span className="text-[11px] font-bold text-slate-900 truncate">
-                  {currentUser ? (currentUser.name || currentUser.email.split('@')[0]) : 'Sign In'}
-                </span>
-                <span className="text-[10px] text-slate-500 font-mono truncate flex items-center gap-1">
+              <div className="flex flex-col text-left leading-tight">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-slate-900 whitespace-nowrap">
+                    {currentUser ? currentUser.name : 'Sign In'}
+                  </span>
+                  {currentUser?.role && (
+                    <span className="hidden sm:inline-block text-[10px] font-semibold px-1.5 py-0.2 rounded bg-brand-50 text-brand-700 border border-brand-200 capitalize whitespace-nowrap">
+                      {currentUser.role.replace('_', ' ')}
+                    </span>
+                  )}
+                </div>
+                <span className="text-[10px] text-slate-500 font-mono flex items-center gap-1 whitespace-nowrap">
                   <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${currentUser ? 'bg-emerald-500' : 'bg-slate-300'}`}></span>
-                  <span className="truncate">{currentUser ? (currentUser.loginId || currentUser.email) : 'Login ID'}</span>
+                  <span>{currentUser ? (currentUser.loginId || currentUser.email) : 'Guest Account'}</span>
                 </span>
               </div>
             </button>
@@ -446,35 +369,129 @@ export const Header: React.FC = () => {
             {/* Mobile Hamburger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="xl:hidden p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50"
+              className="lg:hidden p-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
 
         </div>
+      </div>
 
-        {/* Quick Showcase Scenario Ribbon (Section 30 Demo Feature) */}
-        <div className="py-2 border-t border-slate-100 flex items-center justify-between gap-3 overflow-x-auto text-xs no-scrollbar w-full min-w-0">
-          <div className="flex items-center gap-1.5 text-slate-500 font-medium shrink-0">
-            <Sparkles className="w-3.5 h-3.5 text-saffron-600" />
-            <span className="hidden sm:inline">Interactive Demo Scenarios:</span>
-            <span className="sm:hidden font-semibold">Demos:</span>
-          </div>
-          <div className="flex items-center gap-1.5 min-w-0 overflow-x-auto no-scrollbar shrink-0 sm:shrink">
-            {SHOWCASE_SCENARIOS.map(sc => (
+      {/* Row 2: Main Navigation Tabs & Quick Showcase Scenario Ribbon */}
+      <div className="border-t border-slate-200/80 bg-slate-50/90 shadow-2xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 py-1.5 min-w-0">
+            
+            {/* Desktop Navigation Links */}
+            <nav className="hidden lg:flex items-center gap-1 text-xs font-semibold text-slate-600 overflow-x-auto no-scrollbar py-0.5">
               <button
-                key={sc.id}
-                onClick={() => loadScenario(sc.id)}
-                className={`px-2.5 py-1 rounded-md font-medium transition-all text-[11px] whitespace-nowrap shrink-0 flex items-center gap-1 ${
-                  activeScenarioId === sc.id
-                    ? 'bg-brand-800 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                onClick={() => setActiveTab('home')}
+                className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 shrink-0 ${
+                  activeTab === 'home' ? 'bg-brand-800 text-white font-bold shadow-xs' : 'hover:bg-white text-slate-700'
                 }`}
               >
-                <span>{language === 'hi' ? sc.nameHi : sc.name}</span>
+                <span>{t('nav.home')}</span>
               </button>
-            ))}
+              <button
+                onClick={() => setActiveTab('discover')}
+                className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 shrink-0 ${
+                  activeTab === 'discover' ? 'bg-brand-800 text-white font-bold shadow-xs' : 'hover:bg-white text-slate-700'
+                }`}
+              >
+                <Compass className="w-3.5 h-3.5 text-brand-400" />
+                <span>{t('nav.discover')}</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('services')}
+                className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 shrink-0 ${
+                  activeTab === 'services' ? 'bg-brand-800 text-white font-bold shadow-xs' : 'hover:bg-white text-slate-700'
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5 text-slate-400" />
+                <span>{t('nav.services')}</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('journey')}
+                className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 relative shrink-0 ${
+                  activeTab === 'journey' ? 'bg-brand-800 text-white font-bold shadow-xs' : 'hover:bg-white text-slate-700'
+                }`}
+              >
+                <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                <span>{t('nav.journey')}</span>
+                {activeJourneysCount > 0 && (
+                  <span className="w-4 h-4 rounded-full bg-emerald-600 text-white text-[10px] flex items-center justify-center font-bold">
+                    {activeJourneysCount}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab('documents')}
+                className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 shrink-0 ${
+                  activeTab === 'documents' ? 'bg-brand-800 text-white font-bold shadow-xs' : 'hover:bg-white text-slate-700'
+                }`}
+              >
+                <FolderCheck className="w-3.5 h-3.5 text-amber-400" />
+                <span>{t('nav.documents')}</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('explain')}
+                className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 shrink-0 ${
+                  activeTab === 'explain' ? 'bg-brand-800 text-white font-bold shadow-xs' : 'hover:bg-white text-slate-700'
+                }`}
+              >
+                <HelpCircle className="w-3.5 h-3.5 text-indigo-400" />
+                <span>{t('nav.explain')}</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('vakh')}
+                className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 shrink-0 ${
+                  activeTab === 'vakh' ? 'bg-emerald-700 text-white font-bold shadow-xs' : 'hover:bg-emerald-50 text-emerald-800'
+                }`}
+                title="Vakh Civic Chaupal by @samentha"
+              >
+                <Radio className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
+                <span>Vakh Chaupal</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('saved')}
+                className={`px-2.5 py-1.5 rounded-lg transition-all relative shrink-0 ${
+                  activeTab === 'saved' ? 'bg-brand-800 text-white font-bold shadow-xs' : 'hover:bg-white text-slate-700'
+                }`}
+                title={t('nav.saved')}
+              >
+                <Bookmark className="w-3.5 h-3.5" />
+                {totalSaved > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-saffron-500 text-white text-[10px] flex items-center justify-center font-bold">
+                    {totalSaved}
+                  </span>
+                )}
+              </button>
+            </nav>
+
+            {/* Quick Showcase Scenario Ribbon */}
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 text-xs w-full lg:w-auto">
+              <div className="flex items-center gap-1 text-slate-500 font-semibold shrink-0 text-[11px]">
+                <Sparkles className="w-3 h-3 text-saffron-600" />
+                <span>{language === 'hi' ? 'डेमो:' : 'Demos:'}</span>
+              </div>
+              <div className="flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0">
+                {SHOWCASE_SCENARIOS.map(sc => (
+                  <button
+                    key={sc.id}
+                    onClick={() => loadScenario(sc.id)}
+                    className={`px-2 py-0.5 rounded-md font-medium transition-all text-[11px] whitespace-nowrap shrink-0 flex items-center gap-1 cursor-pointer ${
+                      activeScenarioId === sc.id
+                        ? 'bg-brand-800 text-white shadow-2xs font-bold'
+                        : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    <span>{language === 'hi' ? sc.nameHi : sc.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
           </div>
         </div>
       </div>

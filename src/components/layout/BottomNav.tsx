@@ -8,7 +8,7 @@ export const BottomNav: React.FC = () => {
   const { activeTab, setActiveTab, journeys } = useCitizen();
 
   return (
-    <div className="xl:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-1 py-1 shadow-lg">
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-1 py-1 shadow-lg">
       <div className="grid grid-cols-6 items-center">
         <button
           onClick={() => setActiveTab('home')}
