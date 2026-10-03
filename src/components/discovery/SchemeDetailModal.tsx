@@ -19,8 +19,11 @@ import {
   ArrowRight,
   Sparkles,
   Info,
-  Radio
+  Radio,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
+import { speakText, stopSpeaking, subscribeSpeakingStatus } from '../../utils/speech';
 
 interface SchemeDetailModalProps {
   scheme: Scheme;
@@ -37,8 +40,17 @@ export const SchemeDetailModal: React.FC<SchemeDetailModalProps> = ({
   const { profile, documents, savedSchemeIds, toggleSaveScheme, addJourney, setActiveTab } = useCitizen();
 
   const [evidenceExpanded, setEvidenceExpanded] = useState(true);
+  const [activeSpeechId, setActiveSpeechId] = useState<string | null>(null);
   const evaluation = evaluateSchemeForUser(scheme, profile, documents);
   const isSaved = savedSchemeIds.includes(scheme.id);
+
+  useEffect(() => {
+    const unsub = subscribeSpeakingStatus((id) => setActiveSpeechId(id));
+    return () => {
+      unsub();
+      stopSpeaking();
+    };
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -88,6 +100,35 @@ export const SchemeDetailModal: React.FC<SchemeDetailModalProps> = ({
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
+            {/* Audio Listen Aloud */}
+            <button
+              type="button"
+              onClick={() => {
+                const text = language === 'hi'
+                  ? `${scheme.nameHi}। विभाग: ${scheme.departmentHi}। विवरण: ${scheme.shortDescriptionHi}। सरकारी लाभ: ${scheme.benefitTextHi}।`
+                  : `${scheme.name}. Department: ${scheme.department}. Description: ${scheme.shortDescription}. Benefit: ${scheme.benefitText}.`;
+                speakText(`modal-${scheme.id}`, text, language);
+              }}
+              className={`px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
+                activeSpeechId === `modal-${scheme.id}`
+                  ? 'bg-rose-500 text-white shadow-md ring-2 ring-rose-200 animate-pulse'
+                  : 'bg-white/10 hover:bg-white/20 text-white'
+              }`}
+              title={language === 'hi' ? 'बोलकर सुनें' : 'Listen aloud'}
+            >
+              {activeSpeechId === `modal-${scheme.id}` ? (
+                <>
+                  <VolumeX className="w-4 h-4" />
+                  <span>{language === 'hi' ? 'रोकें ⏹' : 'Stop ⏹'}</span>
+                </>
+              ) : (
+                <>
+                  <Volume2 className="w-4 h-4 text-amber-300" />
+                  <span>{language === 'hi' ? 'बोलकर सुनें 🔊' : 'Listen 🔊'}</span>
+                </>
+              )}
+            </button>
+
             <button
               onClick={() => toggleSaveScheme(scheme.id)}
               className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"

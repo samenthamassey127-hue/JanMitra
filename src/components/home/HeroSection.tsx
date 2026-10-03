@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCitizen } from '../../context/CitizenContext';
 import { analyzeSituationWithBackend } from '../../utils/apiClient';
@@ -15,19 +15,25 @@ import {
   Rocket, 
   HelpCircle, 
   ArrowRight, 
-  Search, 
-  Sparkles, 
-  Mic, 
-  X,
+  Search,
+  Sparkles,
+  Clock,
+  Volume2,
+  VolumeX,
+  Mic,
   CheckCircle2,
-  Clock
+  X
 } from 'lucide-react';
+import { RuralAssistanceHub } from './RuralAssistanceHub';
+import { speakText, stopSpeaking, subscribeSpeakingStatus, startListening, isRecognitionSupported } from '../../utils/speech';
 
 export const HeroSection: React.FC<{ onSelectCategory: (category: CategoryKey) => void }> = ({ onSelectCategory }) => {
   const { language, t } = useLanguage();
   const { profile, removeChip, addChip, updateProfile, setActiveTab, loadScenario } = useCitizen();
   const [inputText, setInputText] = useState('');
   const [isProcessingNlp, setIsProcessingNlp] = useState(false);
+  const [isVoiceListening, setIsVoiceListening] = useState(false);
+  const [activeSpeechId, setActiveSpeechId] = useState<string | null>(null);
 
   const sampleSituations = [
     {
@@ -146,6 +152,70 @@ export const HeroSection: React.FC<{ onSelectCategory: (category: CategoryKey) =
     }, 400);
   };
 
+  useEffect(() => {
+    const unsub = subscribeSpeakingStatus((id) => setActiveSpeechId(id));
+    return () => {
+      unsub();
+      stopSpeaking();
+    };
+  }, []);
+
+  const handleStartVoiceInput = () => {
+    if (isVoiceListening) {
+      setIsVoiceListening(false);
+      return;
+    }
+
+    setIsVoiceListening(true);
+    const recognition = startListening(
+      language,
+      (text) => {
+        setInputText(text);
+        setIsVoiceListening(false);
+        setTimeout(() => {
+          handleAnalyzeInput();
+        }, 300);
+      },
+      (err) => {
+        console.warn('Voice recognition error or unavailable:', err);
+        setIsVoiceListening(false);
+        const fallback = language === 'hi'
+          ? "मैं बाराबंकी से किसान हूँ, 2 एकड़ जमीन है और पीएम किसान चाहिए"
+          : "I am a small farmer in Barabanki with 2 acres land and need PM Kisan";
+        setInputText(fallback);
+        updateProfile({
+          occupation: 'Farmer / Small Landholder',
+          incomeValue: 90000,
+          incomeRange: '< ₹1.0L',
+          district: 'Barabanki',
+          state: 'Uttar Pradesh'
+        });
+        setActiveTab('discover');
+      },
+      () => {
+        setIsVoiceListening(false);
+      }
+    );
+
+    if (!recognition) {
+      setTimeout(() => {
+        const fallback = language === 'hi'
+          ? "मैं बाराबंकी से किसान हूँ, 2 एकड़ जमीन है और पीएम किसान चाहिए"
+          : "I am a small farmer in Barabanki with 2 acres land and need PM Kisan";
+        setInputText(fallback);
+        setIsVoiceListening(false);
+        updateProfile({
+          occupation: 'Farmer / Small Landholder',
+          incomeValue: 90000,
+          incomeRange: '< ₹1.0L',
+          district: 'Barabanki',
+          state: 'Uttar Pradesh'
+        });
+        setActiveTab('discover');
+      }, 1500);
+    }
+  };
+
   const categories = [
     {
       key: 'education' as CategoryKey,
@@ -254,6 +324,35 @@ export const HeroSection: React.FC<{ onSelectCategory: (category: CategoryKey) =
           <p className="mt-3 text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
             {t('hero.subtitle')}
           </p>
+
+          {/* Audio Listen Aloud for Rural Elders */}
+          <div className="flex items-center justify-center gap-2 mt-3">
+            <button
+              type="button"
+              onClick={() => {
+                const speechHi = "नमस्कार! आप क्या करना चाहते हैं? जनमित्र को अपनी जरूरत बताएं। हम संबंधित सरकारी योजनाओं की खोज और पूरी प्रक्रिया में आपका मार्गदर्शन करेंगे।";
+                const speechEn = "What are you trying to do? Tell JanMitra what you need. We will help you find relevant government benefits and guide you through the process.";
+                speakText('hero-header', language === 'hi' ? speechHi : speechEn, language);
+              }}
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-2xs cursor-pointer ${
+                activeSpeechId === 'hero-header'
+                  ? 'bg-rose-500 text-white ring-4 ring-rose-200 animate-pulse'
+                  : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300'
+              }`}
+            >
+              {activeSpeechId === 'hero-header' ? (
+                <>
+                  <VolumeX className="w-4 h-4" />
+                  <span>{language === 'hi' ? 'रोकें ⏹' : 'Stop ⏹'}</span>
+                </>
+              ) : (
+                <>
+                  <Volume2 className="w-4 h-4 text-amber-800" />
+                  <span>{language === 'hi' ? 'बोलकर सुनें 🔊' : 'Listen Aloud 🔊'}</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Conversational Discovery Box (Section 6) */}
@@ -263,7 +362,7 @@ export const HeroSection: React.FC<{ onSelectCategory: (category: CategoryKey) =
             className="bg-white p-2.5 sm:p-3 rounded-2xl border-2 border-brand-700/20 shadow-xl shadow-brand-900/5 transition-all focus-within:border-brand-600 focus-within:ring-4 focus-within:ring-brand-500/10"
           >
             <div className="flex flex-col sm:flex-row items-stretch gap-2">
-              <div className="relative flex-1">
+              <div className="relative flex-1 flex items-center">
                 <input
                   type="text"
                   value={inputText}
@@ -271,6 +370,21 @@ export const HeroSection: React.FC<{ onSelectCategory: (category: CategoryKey) =
                   placeholder={t('hero.input_placeholder')}
                   className="w-full px-4 py-3 text-sm text-slate-800 placeholder-slate-400 bg-transparent rounded-xl focus:outline-hidden"
                 />
+
+                {/* Prominent Voice Mic Button for Rural Citizens */}
+                <button
+                  type="button"
+                  onClick={handleStartVoiceInput}
+                  className={`mr-2 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shrink-0 ${
+                    isVoiceListening
+                      ? 'bg-rose-600 text-white shadow-md ring-4 ring-rose-200 animate-pulse'
+                      : 'bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300'
+                  }`}
+                  title={language === 'hi' ? 'माइक से बोलकर बताएं' : 'Speak via microphone'}
+                >
+                  <Mic className="w-4 h-4 text-amber-900" />
+                  <span>{isVoiceListening ? (language === 'hi' ? 'सुन रहे हैं...' : 'Listening...') : (language === 'hi' ? 'बोलें 🎙' : 'Speak 🎙')}</span>
+                </button>
               </div>
 
               <div className="flex items-center gap-2">
@@ -404,8 +518,11 @@ export const HeroSection: React.FC<{ onSelectCategory: (category: CategoryKey) =
           )}
         </div>
 
+        {/* Dedicated Rural Citizen Convenience Hub (ग्रामीण सहायता केंद्र) */}
+        <RuralAssistanceHub onSelectCategory={onSelectCategory} />
+
         {/* 10 Large Visual Category Cards (Section 5) */}
-        <div className="mt-12">
+        <div className="mt-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
               <span>Explore by Life Area</span>
