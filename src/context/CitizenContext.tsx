@@ -1,11 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { UserProfile, DocumentItem, JourneyItem, ApplicationStage, ShowcaseScenario } from '../types';
+import { UserProfile, DocumentItem, JourneyItem, ApplicationStage, ShowcaseScenario, CurrentUserAccount } from '../types';
 import { ALL_DOCUMENTS } from '../data/documents';
 import { SHOWCASE_SCENARIOS } from '../data/scenarios';
 import { ALL_SCHEMES } from '../data/schemes';
 import { ALL_SERVICES } from '../data/services';
 
 interface CitizenContextType {
+  currentUser: CurrentUserAccount | null;
+  setCurrentUser: (user: CurrentUserAccount | null) => void;
+  logoutUser: () => void;
+  authModalOpen: boolean;
+  setAuthModalOpen: (open: boolean) => void;
   profile: UserProfile;
   updateProfile: (updates: Partial<UserProfile>) => void;
   removeChip: (chipId: string) => void;
@@ -38,6 +43,15 @@ interface CitizenContextType {
   isSearchOpen: boolean;
   setIsSearchOpen: (open: boolean) => void;
 }
+
+export const DEFAULT_USER: CurrentUserAccount = {
+  id: 'JM-USR-88421',
+  loginId: 'samentha@janmitra.gov.in',
+  email: 'samentha@janmitra.gov.in',
+  name: 'Samentha Massey',
+  role: 'officer',
+  district: 'Lucknow'
+};
 
 const DEFAULT_PROFILE: UserProfile = {
   id: 'usr-001',
@@ -146,6 +160,30 @@ const DEFAULT_JOURNEYS: JourneyItem[] = [
 const CitizenContext = createContext<CitizenContextType | undefined>(undefined);
 
 export const CitizenProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState<CurrentUserAccount | null>(() => {
+    try {
+      const saved = localStorage.getItem('janmitra_current_user');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return DEFAULT_USER;
+  });
+
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem('janmitra_current_user', JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem('janmitra_current_user');
+    }
+  }, [currentUser]);
+
+  const logoutUser = () => {
+    localStorage.removeItem('janmitra_auth_token');
+    localStorage.removeItem('janmitra_current_user');
+    setCurrentUser(null);
+  };
+
   const [profile, setProfile] = useState<UserProfile>(() => {
     const saved = localStorage.getItem('janmitra_profile');
     return saved ? JSON.parse(saved) : DEFAULT_PROFILE;
@@ -458,6 +496,11 @@ export const CitizenProvider: React.FC<{ children: React.ReactNode }> = ({ child
   return (
     <CitizenContext.Provider
       value={{
+        currentUser,
+        setCurrentUser,
+        logoutUser,
+        authModalOpen,
+        setAuthModalOpen,
         profile,
         updateProfile,
         removeChip,

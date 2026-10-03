@@ -39,7 +39,12 @@ export const Header: React.FC = () => {
     journeys, 
     loadScenario, 
     activeScenarioId,
-    setIsSearchOpen
+    setIsSearchOpen,
+    currentUser,
+    setCurrentUser,
+    logoutUser,
+    authModalOpen,
+    setAuthModalOpen
   } = useCitizen();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -47,13 +52,6 @@ export const Header: React.FC = () => {
   const [voiceNotice, setVoiceNotice] = useState<string | null>(null);
 
   // Authentication & RBAC state (Phase 2 Roadmap)
-  const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState<{ email: string; full_name?: string; name?: string; role: string; district: string } | null>({
-    email: 'samentha@janmitra.gov.in',
-    name: 'Samentha Massey',
-    role: 'officer',
-    district: 'Lucknow'
-  });
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authName, setAuthName] = useState('');
@@ -92,13 +90,47 @@ export const Header: React.FC = () => {
 
       const res = await loginCitizen(credentials);
       if (res?.user) {
-        setCurrentUser(res.user);
+        setCurrentUser({
+          id: res.user.id || 'JM-USR-88421',
+          loginId: res.user.email,
+          email: res.user.email,
+          name: res.user.name || res.user.full_name || (roleType === 'officer' ? 'Samentha Massey' : roleType === 'pradhan' ? 'Ram Prakash Yadav' : 'Rameshwar Sharma'),
+          role: res.user.role || roleType,
+          district: res.user.district || (roleType === 'pradhan' ? 'Barabanki' : 'Lucknow')
+        });
         setAuthModalOpen(false);
-      } else if (res?.error) {
+      } else {
         // Fallback local role update
-        if (roleType === 'officer') setCurrentUser({ email: credentials.email, name: 'Samentha Massey', role: 'officer', district: 'Lucknow' });
-        if (roleType === 'pradhan') setCurrentUser({ email: credentials.email, name: 'Ram Prakash Yadav', role: 'gram_pradhan', district: 'Barabanki' });
-        if (roleType === 'citizen') setCurrentUser({ email: credentials.email, name: 'Rameshwar Sharma', role: 'citizen', district: 'Lucknow' });
+        if (roleType === 'officer') {
+          setCurrentUser({
+            id: 'JM-OFF-014',
+            loginId: credentials.email,
+            email: credentials.email,
+            name: 'Samentha Massey',
+            role: 'officer',
+            district: 'Lucknow'
+          });
+        }
+        if (roleType === 'pradhan') {
+          setCurrentUser({
+            id: 'JM-PRD-082',
+            loginId: credentials.email,
+            email: credentials.email,
+            name: 'Ram Prakash Yadav',
+            role: 'gram_pradhan',
+            district: 'Barabanki'
+          });
+        }
+        if (roleType === 'citizen') {
+          setCurrentUser({
+            id: 'JM-CTZ-901',
+            loginId: credentials.email,
+            email: credentials.email,
+            name: 'Rameshwar Sharma',
+            role: 'citizen',
+            district: 'Lucknow'
+          });
+        }
         setAuthModalOpen(false);
       }
     } finally {
@@ -115,7 +147,14 @@ export const Header: React.FC = () => {
       if (authMode === 'login') {
         const res = await loginCitizen({ email: authEmail, password: authPassword });
         if (res?.user) {
-          setCurrentUser(res.user);
+          setCurrentUser({
+            id: res.user.id || 'JM-USR-992',
+            loginId: res.user.email,
+            email: res.user.email,
+            name: res.user.name || res.user.full_name || authEmail.split('@')[0],
+            role: res.user.role || 'citizen',
+            district: res.user.district || 'Lucknow'
+          });
           setAuthModalOpen(false);
         } else {
           setAuthError(res?.error || 'Invalid credentials');
@@ -129,7 +168,14 @@ export const Header: React.FC = () => {
           district: 'Lucknow'
         });
         if (res?.user) {
-          setCurrentUser(res.user);
+          setCurrentUser({
+            id: res.user.id || 'JM-USR-993',
+            loginId: res.user.email,
+            email: res.user.email,
+            name: authName || 'Citizen User',
+            role: authRole,
+            district: 'Lucknow'
+          });
           setAuthModalOpen(false);
         } else {
           setAuthError(res?.error || 'Registration failed');
@@ -364,20 +410,30 @@ export const Header: React.FC = () => {
               </button>
             </div>
 
-            {/* Role & Auth Pill */}
+            {/* User Account & Login ID Button */}
             <button
               onClick={() => setAuthModalOpen(true)}
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-brand-200 bg-brand-50 hover:bg-brand-100 text-brand-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
-              title="Switch user role or log in"
+              className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-brand-200 bg-white hover:bg-brand-50/80 text-slate-800 transition-all cursor-pointer shadow-2xs max-w-[190px] sm:max-w-[220px]"
+              title={currentUser ? `Logged in: ${currentUser.name} (${currentUser.loginId || currentUser.email})` : 'Sign In / Account'}
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-brand-600" />
-              <span className="capitalize">{currentUser ? `${currentUser.role.replace('_', ' ')}` : 'Sign In'}</span>
+              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-brand-700 to-brand-900 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : <User className="w-3.5 h-3.5" />}
+              </div>
+              <div className="flex flex-col text-left min-w-0 leading-tight">
+                <span className="text-[11px] font-bold text-slate-900 truncate">
+                  {currentUser ? (currentUser.name || currentUser.email.split('@')[0]) : 'Sign In'}
+                </span>
+                <span className="text-[10px] text-slate-500 font-mono truncate flex items-center gap-1">
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${currentUser ? 'bg-emerald-500' : 'bg-slate-300'}`}></span>
+                  <span className="truncate">{currentUser ? (currentUser.loginId || currentUser.email) : 'Login ID'}</span>
+                </span>
+              </div>
             </button>
 
-            {/* Profile Avatar Button */}
+            {/* Profile Tab Shortcut */}
             <button
               onClick={() => setActiveTab('profile')}
-              className={`p-2 rounded-lg border transition-all ${
+              className={`p-2 rounded-xl border transition-all cursor-pointer ${
                 activeTab === 'profile'
                   ? 'bg-brand-50 border-brand-300 text-brand-700'
                   : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700'
@@ -426,6 +482,28 @@ export const Header: React.FC = () => {
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="xl:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-2 animate-in slide-in-from-top duration-200 shadow-xl">
+          {/* Mobile User Account & Login ID Card */}
+          <div 
+            onClick={() => { setAuthModalOpen(true); setMobileMenuOpen(false); }}
+            className="p-3 bg-gradient-to-r from-slate-900 to-brand-950 text-white rounded-2xl flex items-center justify-between gap-3 cursor-pointer shadow-md mb-2 border border-brand-800/40"
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-600 to-brand-800 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-2xs border border-brand-400/30">
+                {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
+              </div>
+              <div className="min-w-0">
+                <span className="text-xs font-bold text-white block truncate">{currentUser?.name || 'Sign In / Account'}</span>
+                <span className="text-[10px] text-brand-200 font-mono block truncate flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+                  {currentUser ? (currentUser.loginId || currentUser.email) : 'Tap to sign in'}
+                </span>
+              </div>
+            </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-saffron-500/20 text-saffron-300 uppercase shrink-0 border border-saffron-500/30">
+              {currentUser?.role ? currentUser.role.replace('_', ' ') : 'Guest'}
+            </span>
+          </div>
+
           <button
             onClick={() => { setActiveTab('home'); setMobileMenuOpen(false); }}
             className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-100 flex items-center justify-between"
@@ -528,6 +606,69 @@ export const Header: React.FC = () => {
                 <X className="w-5 h-5" />
               </button>
             </div>
+
+            {/* Active User Account & Login ID Card */}
+            {currentUser && (
+              <div className="bg-gradient-to-br from-slate-900 via-brand-950 to-slate-900 text-white p-4 rounded-2xl mb-5 shadow-lg border border-brand-800/60">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-saffron-400 bg-saffron-500/20 px-2 py-0.5 rounded-md border border-saffron-500/30">
+                    Logged In User Account
+                  </span>
+                  <span className="text-[10px] font-medium text-emerald-400 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Verified Session
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand-600 to-brand-800 text-white font-extrabold text-base flex items-center justify-center shrink-0 shadow-md border border-brand-400/30">
+                    {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h4 className="text-sm font-bold text-white truncate">
+                      {currentUser.name || 'Citizen User'}
+                    </h4>
+                    <p className="text-xs text-brand-200 font-mono truncate select-all">
+                      Login ID: <strong className="text-white">{currentUser.loginId || currentUser.email}</strong>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-3 pt-3 border-t border-white/10 grid grid-cols-2 gap-2 text-[11px]">
+                  <div className="bg-white/5 p-2 rounded-lg">
+                    <span className="text-slate-400 block text-[10px] font-medium uppercase">Active Role</span>
+                    <span className="font-semibold text-white capitalize">{currentUser.role.replace('_', ' ')}</span>
+                  </div>
+                  <div className="bg-white/5 p-2 rounded-lg">
+                    <span className="text-slate-400 block text-[10px] font-medium uppercase">District</span>
+                    <span className="font-semibold text-white">{currentUser.district || 'Lucknow, UP'}</span>
+                  </div>
+                </div>
+
+                <div className="mt-3 pt-2.5 flex items-center justify-between gap-2 border-t border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab('profile');
+                      setAuthModalOpen(false);
+                    }}
+                    className="text-xs text-saffron-300 hover:text-saffron-200 font-medium underline underline-offset-2 cursor-pointer"
+                  >
+                    View Citizen Profile Details →
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      logoutUser();
+                      setAuthModalOpen(false);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs font-semibold transition-colors cursor-pointer"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Quick 1-Click Role Switcher */}
             <div className="mb-5">

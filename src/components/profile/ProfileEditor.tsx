@@ -15,7 +15,7 @@ import {
 
 export const ProfileEditor: React.FC = () => {
   const { language } = useLanguage();
-  const { profile, updateProfile, addChip } = useCitizen();
+  const { profile, updateProfile, addChip, currentUser, logoutUser, setAuthModalOpen } = useCitizen();
 
   const [formData, setFormData] = useState<UserProfile>(profile);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -46,7 +46,82 @@ export const ProfileEditor: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+    <div className="space-y-6">
+      
+      {/* Official Citizen Account & Login ID Banner */}
+      <div className="bg-gradient-to-r from-slate-900 via-brand-950 to-slate-900 text-white rounded-3xl p-6 sm:p-7 shadow-lg border border-brand-800/50">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 text-white flex items-center justify-center font-bold text-lg shadow-md border border-brand-400/30">
+              {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm sm:text-base font-extrabold text-white">
+                  {currentUser?.name || formData.name || 'Citizen User'}
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                  {currentUser?.role ? currentUser.role.replace('_', ' ') : 'Citizen'}
+                </span>
+              </div>
+              <p className="text-xs text-brand-200 font-mono mt-0.5 flex items-center gap-1.5">
+                <span className="text-slate-400">Login ID:</span>
+                <span className="font-semibold text-white select-all">{currentUser?.loginId || currentUser?.email || 'citizen@janmitra.in'}</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setAuthModalOpen(true)}
+              className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 border border-white/10 transition-colors cursor-pointer"
+            >
+              <ShieldCheck className="w-4 h-4 text-saffron-400" />
+              <span>Switch Account / Role</span>
+            </button>
+            {currentUser && (
+              <button
+                type="button"
+                onClick={logoutUser}
+                className="px-3.5 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-semibold border border-rose-500/30 transition-colors cursor-pointer"
+              >
+                Sign Out
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-xs">
+          <div className="bg-white/5 p-3 rounded-xl border border-white/5">
+            <span className="text-[10px] text-slate-400 block font-semibold uppercase">Account Ref ID</span>
+            <span className="font-mono font-bold text-amber-300 truncate block">
+              {currentUser?.id || 'JM-USR-88421'}
+            </span>
+          </div>
+          <div className="bg-white/5 p-3 rounded-xl border border-white/5">
+            <span className="text-[10px] text-slate-400 block font-semibold uppercase">Assigned District</span>
+            <span className="font-bold text-white truncate block">
+              {currentUser?.district || formData.district || 'Lucknow, UP'}
+            </span>
+          </div>
+          <div className="bg-white/5 p-3 rounded-xl border border-white/5">
+            <span className="text-[10px] text-slate-400 block font-semibold uppercase">Session Security</span>
+            <span className="font-semibold text-emerald-400 flex items-center gap-1 truncate">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              JWT Authenticated
+            </span>
+          </div>
+          <div className="bg-white/5 p-3 rounded-xl border border-white/5">
+            <span className="text-[10px] text-slate-400 block font-semibold uppercase">Data Storage</span>
+            <span className="font-semibold text-slate-300 truncate block">
+              Zero-Cloud Privacy Vault
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
       
       <div className="flex items-center justify-between pb-6 border-b border-slate-100 mb-6">
         <div>
@@ -250,6 +325,7 @@ export const ProfileEditor: React.FC = () => {
 
       </form>
 
+      </div>
     </div>
   );
 };

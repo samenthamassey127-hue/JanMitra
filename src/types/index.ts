@@ -236,3 +236,14 @@ export interface ShowcaseScenario {
   targetServiceId?: string;
   targetLegalSnippetId?: string;
 }
+
+export interface CurrentUserAccount {
+  id?: string;
+  loginId: string;
+  email: string;
+  name: string;
+  full_name?: string;
+  role: 'citizen' | 'officer' | 'gram_pradhan' | string;
+  district: string;
+  token?: string;
+}
