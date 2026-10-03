@@ -92,23 +92,25 @@ export const LandingOverview: React.FC = () => {
         </div>
 
         {/* 5 Core Pillars (Section 31) */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5 mb-14">
           {pillars.map((pillar, idx) => {
             const Icon = pillar.icon;
             return (
               <div 
                 key={idx}
-                className="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-slate-300 transition-all hover:shadow-md"
+                className="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-slate-300 transition-all hover:shadow-md flex flex-col justify-between"
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 border ${pillar.color}`}>
-                  <Icon className="w-5 h-5" />
+                <div>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 border ${pillar.color}`}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <h3 className="font-bold text-slate-900 text-base mb-1.5">
+                    {language === 'hi' ? pillar.titleHi : pillar.titleEn}
+                  </h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    {language === 'hi' ? pillar.descHi : pillar.descEn}
+                  </p>
                 </div>
-                <h3 className="font-bold text-slate-900 text-base mb-1.5">
-                  {language === 'hi' ? pillar.titleHi : pillar.titleEn}
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  {language === 'hi' ? pillar.descHi : pillar.descEn}
-                </p>
               </div>
             );
           })}
@@ -132,7 +134,7 @@ export const LandingOverview: React.FC = () => {
           </div>
 
           {/* Loop Stepper Horizontal / Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 gap-2.5">
             {loopSteps.map((st, idx) => (
               <div 
                 key={idx}
