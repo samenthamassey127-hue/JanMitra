@@ -97,13 +97,35 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ evaluation, onOpenDetail
         </p>
 
         {/* Potential Benefit Display */}
-        <div className="bg-brand-50/60 border border-brand-100 rounded-xl p-3 mb-4">
+        <div className="bg-brand-50/60 border border-brand-100 rounded-xl p-3 mb-3">
           <span className="text-[11px] font-semibold text-brand-900 block mb-0.5">
             {t('results.potential_benefit')} (Estimated):
           </span>
           <p className="text-xs font-bold text-brand-800 leading-snug">
             {scheme.benefitAmountEstimate || (language === 'hi' ? scheme.benefitTextHi : scheme.benefitText)}
           </p>
+        </div>
+
+        {/* Scoring & Criteria Breakdown (Statutory vs Document Readiness) */}
+        <div className="grid grid-cols-2 gap-2 mb-3.5">
+          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+            <span className="text-[10px] text-slate-500 font-semibold block uppercase">Statutory Match</span>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="text-sm font-extrabold text-slate-900">{evaluation.statutoryMatchPercent}%</span>
+              <span className="text-[10px] text-slate-500 font-medium">({matchedRulesCount}/{totalRulesCount} rules)</span>
+            </div>
+          </div>
+          <div className={`p-2.5 rounded-xl border ${evaluation.documentGapCount === 0 ? 'bg-emerald-50/60 border-emerald-200' : 'bg-amber-50/60 border-amber-200'}`}>
+            <span className="text-[10px] text-slate-500 font-semibold block uppercase">Document Readiness</span>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className={`text-sm font-extrabold ${evaluation.documentGapCount === 0 ? 'text-emerald-700' : 'text-amber-800'}`}>
+                {evaluation.documentReadinessPercent}%
+              </span>
+              <span className="text-[10px] text-slate-500 font-medium">
+                {evaluation.documentGapCount === 0 ? 'All ready' : `${evaluation.documentGapCount} gap`}
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Why you're seeing this (Section 7 requirement) */}

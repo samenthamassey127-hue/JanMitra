@@ -12,6 +12,9 @@ export interface SchemeEvaluationResult {
   missingDocumentCodes: string[];
   expiredDocumentCodes: string[];
   missingBridges: Scheme['missingRequirementBridges'];
+  statutoryMatchPercent: number;
+  documentReadinessPercent: number;
+  documentGapCount: number;
 }
 
 export function evaluateSchemeForUser(
@@ -75,6 +78,14 @@ export function evaluateSchemeForUser(
     missingDocumentCodes.includes(b.documentCode) || expiredDocumentCodes.includes(b.documentCode)
   );
 
+  const statutoryMatchPercent = scheme.rules.length > 0 
+    ? Math.round((matchedRules.length / scheme.rules.length) * 100) 
+    : 100;
+  const documentReadinessPercent = scheme.requiredDocumentCodes.length > 0 
+    ? Math.round((availableDocsCount / scheme.requiredDocumentCodes.length) * 100) 
+    : 100;
+  const documentGapCount = missingDocumentCodes.length + expiredDocumentCodes.length;
+
   return {
     scheme,
     overallStatus,
@@ -86,7 +97,10 @@ export function evaluateSchemeForUser(
     totalDocsCount: scheme.requiredDocumentCodes.length,
     missingDocumentCodes,
     expiredDocumentCodes,
-    missingBridges: activeBridges
+    missingBridges: activeBridges,
+    statutoryMatchPercent,
+    documentReadinessPercent,
+    documentGapCount
   };
 }
 

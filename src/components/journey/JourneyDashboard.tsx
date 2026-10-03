@@ -18,6 +18,12 @@ import {
   ExternalLink
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { 
+  trackApplicationNumber, 
+  verifyEdistrictCertificate, 
+  checkDbtAadhaarSeeding,
+  updateUserJourneyStage as apiUpdateStage 
+} from '../../utils/apiClient';
 
 export const JourneyDashboard: React.FC<{ onNavigateToService: (serviceId: string) => void }> = ({ onNavigateToService }) => {
   const { language, t } = useLanguage();
@@ -28,11 +34,29 @@ export const JourneyDashboard: React.FC<{ onNavigateToService: (serviceId: strin
   const [tempNotes, setTempNotes] = useState('');
   const [tempAppNumber, setTempAppNumber] = useState('');
 
+  // Verified Status Tracking State (Phase 4 Roadmap)
+  const [trackingQuery, setTrackingQuery] = useState('');
+  const [isTracking, setIsTracking] = useState(false);
+  const [trackingResult, setTrackingResult] = useState<any>(null);
+
+  // Government Sandbox Adapter State (Phase 4 Roadmap)
+  const [activeSandboxTab, setActiveSandboxTab] = useState<'edistrict' | 'dbt'>('edistrict');
+  const [sandboxInput, setSandboxInput] = useState('24151001004829');
+  const [isSandboxRunning, setIsSandboxRunning] = useState(false);
+  const [sandboxResult, setSandboxResult] = useState<any>(null);
+
   const currentJourney = journeys.find(j => j.id === activeJourneyId) || journeys[0];
 
-  const handleStageChange = (stage: ApplicationStage) => {
+  const handleStageChange = async (stage: ApplicationStage) => {
     if (!currentJourney) return;
     updateJourneyStage(currentJourney.id, stage);
+
+    // Synchronize to backend database
+    try {
+      await apiUpdateStage(currentJourney.id, stage, `Updated to ${stage} by citizen`);
+    } catch {
+      // Offline fallback
+    }
 
     if (stage === 'approved' || stage === 'completed') {
       confetti({
@@ -40,6 +64,39 @@ export const JourneyDashboard: React.FC<{ onNavigateToService: (serviceId: strin
         spread: 70,
         origin: { y: 0.6 }
       });
+    }
+  };
+
+  const handleTrackApplication = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const query = trackingQuery.trim() || currentJourney?.applicationNumber || 'UP/2026/PMS/884219';
+    setIsTracking(true);
+    setTrackingResult(null);
+
+    try {
+      const res = await trackApplicationNumber(query);
+      if (res?.success) {
+        setTrackingResult(res);
+      }
+    } finally {
+      setIsTracking(false);
+    }
+  };
+
+  const handleRunSandboxCheck = async () => {
+    setIsSandboxRunning(true);
+    setSandboxResult(null);
+
+    try {
+      if (activeSandboxTab === 'edistrict') {
+        const res = await verifyEdistrictCertificate('income', sandboxInput, 'UP-ED-2024-4829');
+        setSandboxResult(res);
+      } else {
+        const res = await checkDbtAadhaarSeeding(sandboxInput.slice(-4) || '4829');
+        setSandboxResult(res);
+      }
+    } finally {
+      setIsSandboxRunning(false);
     }
   };
 
@@ -331,6 +388,165 @@ export const JourneyDashboard: React.FC<{ onNavigateToService: (serviceId: strin
           )}
         </div>
 
+      </div>
+
+      {/* Verified Application-Status Tracking (Phase 4 Roadmap) */}
+      <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-brand-700 bg-brand-50 px-2.5 py-0.5 rounded-full border border-brand-200">
+              Statutory Transparency Portal
+            </span>
+            <h3 className="text-xl font-extrabold text-slate-900 mt-1 flex items-center gap-2">
+              <Clock className="w-5 h-5 text-brand-600" />
+              <span>UP Right to Public Services Status Tracker</span>
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Enter any UP e-District or scholarship application number to audit handling officers and Janhit Guarantee SLA deadlines.
+            </p>
+          </div>
+        </div>
+
+        <form onSubmit={handleTrackApplication} className="flex flex-col sm:flex-row items-center gap-2 mb-6">
+          <input
+            type="text"
+            value={trackingQuery}
+            onChange={(e) => setTrackingQuery(e.target.value)}
+            placeholder={currentJourney?.applicationNumber || "Enter Application No. (e.g. UP/2026/PMS/884219)"}
+            className="flex-1 w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-mono font-medium focus:outline-hidden focus:border-brand-600"
+          />
+          <button
+            type="submit"
+            disabled={isTracking}
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-brand-700 hover:bg-brand-800 disabled:opacity-60 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+          >
+            {isTracking ? 'Auditing Gateway...' : 'Track Verified Status'}
+          </button>
+        </form>
+
+        {trackingResult && (
+          <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 animate-in fade-in">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3 mb-4">
+              <div>
+                <span className="text-xs font-mono font-bold text-slate-900 block">
+                  Ref: {trackingResult.applicationNumber}
+                </span>
+                <span className="text-xs text-slate-500 font-medium">
+                  {trackingResult.serviceName} • Applicant: {trackingResult.applicantName} ({trackingResult.district})
+                </span>
+              </div>
+              <div className="text-right">
+                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">
+                  Janhit SLA: {trackingResult.slaGuarantee?.statutoryLimitDays || 15} Days Max
+                </span>
+                <span className="text-[10px] text-slate-400 block mt-0.5">
+                  Statutory Deadline: {trackingResult.slaGuarantee?.deadlineDate}
+                </span>
+              </div>
+            </div>
+
+            {/* Step-by-Step Timeline */}
+            <div className="space-y-3">
+              {trackingResult.timeline?.map((step: any, idx: number) => (
+                <div key={idx} className="flex items-start gap-3 bg-white p-3 rounded-xl border border-slate-200">
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${
+                    step.status === 'Completed' ? 'bg-emerald-600 text-white' : step.status === 'In Progress' ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-600'
+                  }`}>
+                    {step.status === 'Completed' ? '✓' : idx + 1}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-bold text-slate-900">{step.stage}</span>
+                      <span className="text-[11px] text-slate-400 font-mono">{step.timestamp}</span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 mt-0.5">{step.remarks}</p>
+                    <span className="text-[10px] text-brand-700 font-semibold block mt-1">
+                      Desk: {step.officer}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+              <span>First Appellate Authority: Sub-Divisional Magistrate (SDM)</span>
+              <span className="font-mono text-[11px]">Digital Seal: {trackingResult.digitalReceipt?.receiptNumber}</span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Authorized Government Service Adapters Sandbox (Phase 4 Roadmap) */}
+      <div className="bg-slate-900 text-slate-200 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 border-b border-slate-800 pb-4">
+          <div>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-saffron-400 bg-saffron-400/10 px-2.5 py-0.5 rounded-full border border-saffron-400/20">
+              Government Sandbox Adapters
+            </span>
+            <h3 className="text-lg font-bold text-white mt-1">
+              Live Gateway Simulator (UP e-District, DigiLocker, DBT)
+            </h3>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Simulate electronic verification against official government API endpoints.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-1.5 bg-slate-800 p-1 rounded-xl">
+            <button
+              type="button"
+              onClick={() => { setActiveSandboxTab('edistrict'); setSandboxInput('24151001004829'); setSandboxResult(null); }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                activeSandboxTab === 'edistrict' ? 'bg-brand-600 text-white' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              UP e-District
+            </button>
+            <button
+              type="button"
+              onClick={() => { setActiveSandboxTab('dbt'); setSandboxInput('4829'); setSandboxResult(null); }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                activeSandboxTab === 'dbt' ? 'bg-brand-600 text-white' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              NPCI / PFMS DBT
+            </button>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center gap-3 mb-4">
+          <div className="w-full sm:w-auto flex-1">
+            <label className="text-xs text-slate-400 block mb-1">
+              {activeSandboxTab === 'edistrict' ? 'UP Certificate Number (14 digits):' : 'Aadhaar Last 4 Digits:'}
+            </label>
+            <input
+              type="text"
+              value={sandboxInput}
+              onChange={(e) => setSandboxInput(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white font-mono text-xs focus:outline-hidden focus:border-brand-500"
+            />
+          </div>
+
+          <button
+            type="button"
+            disabled={isSandboxRunning}
+            onClick={handleRunSandboxCheck}
+            className="w-full sm:w-auto mt-4 sm:mt-5 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-md"
+          >
+            {isSandboxRunning ? 'Querying Sandbox...' : 'Run Official Verification'}
+          </button>
+        </div>
+
+        {sandboxResult && (
+          <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700 text-xs font-mono animate-in fade-in">
+            <div className="flex items-center justify-between text-emerald-400 mb-2">
+              <span className="font-bold">Gateway Response: 200 OK</span>
+              <span className="text-[11px] text-slate-400">{sandboxResult.portal || sandboxResult.gateway}</span>
+            </div>
+            <pre className="text-slate-300 text-[11px] overflow-x-auto p-3 bg-slate-950 rounded-xl">
+              {JSON.stringify(sandboxResult.certificateDetails || sandboxResult.seedingStatus, null, 2)}
+            </pre>
+          </div>
+        )}
       </div>
 
     </div>

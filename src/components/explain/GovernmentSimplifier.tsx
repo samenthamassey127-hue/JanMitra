@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCitizen } from '../../context/CitizenContext';
+import { simplifyLegalWithBackend } from '../../utils/apiClient';
 import { ALL_LEGAL_SNIPPETS } from '../../data/legalSnippets';
 import { LegalSnippet } from '../../types';
 import { 
@@ -28,18 +29,35 @@ export const GovernmentSimplifier: React.FC = () => {
   const [customText, setCustomText] = useState('');
   const [isSimplifying, setIsSimplifying] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [customResult, setCustomResult] = useState<{
+    engine: string;
+    title: string;
+    whatItMeans: string;
+    whoGetsIt: string;
+    actionStep: string;
+    caution: string;
+  } | null>(null);
 
   const activeSnippet = ALL_LEGAL_SNIPPETS.find(s => s.id === activeSnippetId) || ALL_LEGAL_SNIPPETS[0];
 
-  const handleCustomSimplify = (e: React.FormEvent) => {
+  const handleCustomSimplify = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!customText.trim()) return;
 
     setIsSimplifying(true);
-    setTimeout(() => {
+    try {
+      const res = await simplifyLegalWithBackend(customText, language);
+      if (res?.simplified) {
+        setCustomResult({
+          engine: res.engine || 'JanMitra Intelligence Engine',
+          ...res.simplified
+        });
+      }
+    } catch (err) {
+      console.log('Simplification fallback:', err);
+    } finally {
       setIsSimplifying(false);
-      // Fallback to active snippet for prototype demonstration
-    }, 800);
+    }
   };
 
   const copyToClipboard = () => {
@@ -133,6 +151,70 @@ export const GovernmentSimplifier: React.FC = () => {
           </div>
         </form>
       </div>
+
+      {/* Custom AI Simplification Result Card */}
+      {customResult && (
+        <div className="bg-gradient-to-br from-indigo-50/70 via-white to-purple-50/40 rounded-3xl border-2 border-indigo-200 p-6 sm:p-8 shadow-lg space-y-6">
+          <div className="flex items-center justify-between border-b border-indigo-100 pb-4">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-800 bg-indigo-100/70 px-2.5 py-0.5 rounded-full border border-indigo-200">
+                {customResult.engine}
+              </span>
+              <h3 className="text-xl font-black text-slate-900 mt-1.5">{customResult.title}</h3>
+            </div>
+            <button
+              onClick={() => setCustomResult(null)}
+              className="text-xs text-slate-400 hover:text-slate-600 px-2 py-1 rounded"
+            >
+              Clear
+            </button>
+          </div>
+
+          {/* What it means */}
+          <div className="bg-white p-4 rounded-2xl border border-indigo-100 shadow-2xs space-y-1">
+            <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+              What this clause means in plain words:
+            </span>
+            <p className="text-sm font-semibold text-slate-900 leading-relaxed">
+              {customResult.whatItMeans}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            {/* Who gets it */}
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 space-y-1">
+              <span className="font-bold text-slate-700 uppercase tracking-wider block text-[10px]">
+                Who Qualifies / Applicable To:
+              </span>
+              <p className="text-slate-800 leading-relaxed font-medium">
+                {customResult.whoGetsIt}
+              </p>
+            </div>
+
+            {/* Action Step */}
+            <div className="bg-emerald-50/60 p-4 rounded-2xl border border-emerald-200 space-y-1">
+              <span className="font-bold text-emerald-800 uppercase tracking-wider block text-[10px]">
+                Immediate Action Required:
+              </span>
+              <p className="text-emerald-950 leading-relaxed font-medium">
+                {customResult.actionStep}
+              </p>
+            </div>
+          </div>
+
+          {/* Caution */}
+          {customResult.caution && (
+            <div className="bg-amber-50/80 p-4 rounded-2xl border border-amber-200 flex items-start gap-2.5 text-xs text-amber-900">
+              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold block mb-0.5">Common Rejection Trap to Avoid:</span>
+                <span className="leading-relaxed">{customResult.caution}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Active Snippet Simplification Showcase (Section 18) */}
       <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-md space-y-6">

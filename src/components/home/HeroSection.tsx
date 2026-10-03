@@ -52,11 +52,20 @@ export const HeroSection: React.FC<{ onSelectCategory: (category: CategoryKey) =
     }
   ];
 
+  const [analysisFeedback, setAnalysisFeedback] = useState<{
+    confidence: number;
+    ambiguity: string;
+    flags: string[];
+    questions: string[];
+    summary?: string;
+  } | null>(null);
+
   const handleAnalyzeInput = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!inputText.trim()) return;
 
     setIsProcessingNlp(true);
+    setAnalysisFeedback(null);
 
     try {
       const backendResult = await analyzeSituationWithBackend(inputText, language);
@@ -68,18 +77,24 @@ export const HeroSection: React.FC<{ onSelectCategory: (category: CategoryKey) =
         if (p.state) updates.state = p.state;
         if (p.education) updates.education = p.education;
         if (p.occupation) updates.occupation = p.occupation;
-        if (p.incomeValue) {
-          updates.incomeValue = p.incomeValue;
-          updates.incomeRange = p.incomeRange || (p.incomeValue <= 100000 ? '< ₹1.0L' : '₹1.0L - ₹2.5L');
+        if (p.annualIncome || p.incomeValue) {
+          const inc = p.annualIncome || p.incomeValue;
+          updates.incomeValue = inc;
+          updates.incomeRange = inc <= 100000 ? '< ₹1.0L' : inc <= 250000 ? '₹1.0L - ₹2.5L' : '₹2.5L - ₹5.0L';
         }
         if (p.category) updates.category = p.category;
         updateProfile(updates);
 
-        if (p.goal && p.goal.toLowerCase().includes('certificate')) {
-          setActiveTab('services');
-        } else {
-          setActiveTab('discover');
+        if (backendResult.uncertainty) {
+          setAnalysisFeedback({
+            confidence: Math.round((backendResult.uncertainty.confidenceScore || 0.85) * 100),
+            ambiguity: backendResult.uncertainty.ambiguityLevel || 'Low',
+            flags: backendResult.uncertainty.flags || [],
+            questions: backendResult.uncertainty.clarifyingQuestions || [],
+            summary: p.summary
+          });
         }
+
         setIsProcessingNlp(false);
         return;
       }
@@ -330,6 +345,63 @@ export const HeroSection: React.FC<{ onSelectCategory: (category: CategoryKey) =
               Edit all details
             </button>
           </div>
+
+          {/* NLP Uncertainty & Ambiguity Resolution Card (Phase 1 & 3 Roadmap) */}
+          {analysisFeedback && (
+            <div className="mt-4 p-4 rounded-2xl bg-white border border-brand-200 shadow-md text-left max-w-2xl mx-auto animate-in fade-in slide-in-from-top-2">
+              <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-2.5 mb-2.5">
+                <div className="flex items-center gap-2">
+                  <div className={`w-2.5 h-2.5 rounded-full ${analysisFeedback.confidence >= 80 ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                  <span className="text-xs font-bold text-slate-900">
+                    Extraction Confidence: {analysisFeedback.confidence}%
+                  </span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                    analysisFeedback.ambiguity === 'Low' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
+                  }`}>
+                    {analysisFeedback.ambiguity} Ambiguity
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setAnalysisFeedback(null)}
+                  className="text-slate-400 hover:text-slate-600 text-xs"
+                >
+                  Dismiss
+                </button>
+              </div>
+
+              {analysisFeedback.summary && (
+                <p className="text-xs text-slate-600 mb-2 font-medium">
+                  {analysisFeedback.summary}
+                </p>
+              )}
+
+              {analysisFeedback.questions.length > 0 && (
+                <div className="space-y-1.5 mt-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wide block">
+                    Clarifying Questions (Help refine your match):
+                  </span>
+                  {analysisFeedback.questions.map((q, idx) => (
+                    <div key={idx} className="flex items-start gap-2 text-xs text-slate-700">
+                      <HelpCircle className="w-3.5 h-3.5 text-brand-600 shrink-0 mt-0.5" />
+                      <span>{q}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="mt-3 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('discover')}
+                  className="px-4 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-semibold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                >
+                  <span>View Matched Schemes</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* 10 Large Visual Category Cards (Section 5) */}
